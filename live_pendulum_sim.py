@@ -1,4 +1,4 @@
-## Simple simulation for a swinging pendulum.
+## Simple simulation for a swinging pendulum. Solved in real time.
 #  Use python3, not conda
 
 import math

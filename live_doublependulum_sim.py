@@ -1,5 +1,8 @@
-## Simple simulation for a swinging pendulum.
+## Simple simulation for a swinging double pendulum.
 #  Use python3, not conda
+#  The equations of motion of the pendulums are solved in real time between the 
+#  frames of the animation. Run using sudo to control the pendulum with an applied 
+#  torque at the center pivot using the right and left arrow keys.
 
 import math
 from time import time
@@ -9,6 +12,7 @@ import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 import keyboard
 
+# Redefine useful math functions
 sin = math.sin
 cos = math.cos
 
@@ -39,9 +43,11 @@ class pendulum_model():
 
 
     def dydt(self,t,y):
-        # Define dynamics of pendulum model
-        # y[0] = theta
-        # y[1] = theta_dot
+        # Define dynamics of double pendulum model.
+        # y[0] = theta1
+        # y[1] = theta1_dot
+        # y[2] = theta2
+        # y[3] = theta2_dot
 
         if keyboard.is_pressed('right'):
             tau = 1
@@ -50,7 +56,7 @@ class pendulum_model():
         else: 
             tau = 0
 
-        tau = tau*2
+        tau = tau*10
 
         theta1_dot = y[1]
         theta1_ddot = (-self.g*(2*self.m1 + self.m2)*sin(y[0]) - self.m2*self.g*sin(y[0]-2*y[2]) - 2*sin(y[0]-y[2])*self.m2*(y[3]**2*self.L2 + y[1]**2*self.L1*cos(y[0]-y[2])))/( self.L1*(2*self.m1 + self.m2 - self.m2*cos(2*y[0]-2*y[2])) ) - self.b*y[1] + tau
