@@ -5,7 +5,7 @@
 #  the right and left arrow keys.
 
 import math
-from time import time
+import time
 import numpy as np
 from scipy.integrate import solve_ivp
 import matplotlib.pyplot as plt
@@ -62,24 +62,29 @@ class pendulum_model():
 
     def step(self, dt):
         # Calculate one time step
+        t1 = time.time()
         self.state = solve_ivp(self.dydt, t_span=[0,dt], y0=self.state).y[:,-1]
+        time.sleep(dt-(time.time()-t1))
         self.elapsed_time += dt
 
 
 my_model = pendulum_model()
-dt = 0.05
+fps = 30
+dt = 1/fps
+
+plt.rcParams['toolbar'] = 'None'
 
 fig = plt.figure(figsize=(6,6))
 plt.subplots_adjust(top=1,bottom=0,right=1,left=0)
 ax = plt.axes()
 line, = ax.plot([],[])
 circle = ax.scatter([],[],s=200)
-#cart = ax.scatter([],[],s=500)
 width = 1
 height = 0.5
 cart = Rectangle([-width/2,0],width,height,fill=False)
 ax.add_patch(cart)
 time_text = ax.text(0.01, 0.01, '', transform=ax.transAxes)
+x_text = ax.text(0.01, 0.05, '', transform=ax.transAxes)
 plt.title('Cart-Pendulum Simulator')
 plt.xlabel('x [m]')
 plt.ylabel('y [m]')
@@ -87,9 +92,7 @@ plt.xlim([-4,4])
 plt.ylim([-4,4])
 ax.axes.xaxis.set_ticklabels([])
 ax.axes.yaxis.set_ticklabels([])
-#plt.axes().get_xaxis().set_visible(False)
-#ax.get_yaxes().set_visible(True)
-plt.grid(True)
+plt.grid(True, which='both', linestyle='--', linewidth=.2)
 
 
 def animate(i):
@@ -101,15 +104,16 @@ def animate(i):
     circle.set_offsets([xp,yp+height/2])
     cart.set_xy((x-width/2,0))
     time_text.set_text('t={}s'.format(round(my_model.elapsed_time)))
+    x_text.set_text('x={}m'.format(round(x,1)))
     ax.set_xlim(x-4,x+4)
     return line,circle,cart,time_text,ax
 
 
-t0 = time()
+t0 = time.time()
 animate(0)
-t1 = time()
+t1 = time.time()
 interval = 1000 * (dt - (t1 - t0))
 print('Interval: {} s'.format(interval/1000))
 
-pend_ani = animation.FuncAnimation(fig, animate, frames=1000, interval=interval, blit=True)
+pend_ani = animation.FuncAnimation(fig, animate, frames=1000, blit=True)
 plt.show()
